@@ -1,7 +1,7 @@
 from sqlalchemy import insert, select, update
 
 from dependencies import async_engine
-from schemas import UserCreate
+from schemas import UserData
 from dependencies import async_session
 from models import UserModel
 

@@ -4,7 +4,8 @@ import uvicorn
 
 app = FastAPI()
 
-app.include_router(user_router, prefix="/register")
+
+app.include_router(user_router)
 
 
 @app.get('/')
