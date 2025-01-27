@@ -1,13 +1,15 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy import select
-from fastapi import HTTPException
+from fastapi import HTTPException, Depends
 from app.security import verify_access_token
 from models import UserModel
 from config import settings
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-
+from crud import AsyncCRUD
+import asyncio
+import time
 
 o2auth_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
@@ -37,6 +39,16 @@ async def get_current_user(token: str):
     if user is None:
         raise HTTPException(status_code=401, detail="Тоже инвалид, не знаю")
     return user
+
+
+def require_role(role: str):
+    async def dependency(current_user: UserModel = Depends(get_current_user)):
+        role_id = await AsyncCRUD.get_role_id(role)
+        if role_id != current_user.role_id:
+            raise HTTPException(status_code=403, detail="Нету прав")
+        return current_user
+    return dependency
+
 
 
 
